@@ -5,7 +5,8 @@ const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (email && password) {
         const user = await User.findOne({ email })
-        if (user && (await user.matchPasswords(password))) {
+        const hasValidPassword = await user.matchPasswords(password)
+        if (user && hasValidPassword) {
             generateToken(res, user._id)
             res.status(200).json({
                 _id: user._id,
@@ -13,10 +14,14 @@ const authUser = asyncHandler(async (req, res) => {
                 email: user.email
             })
         }
+        else{
+            res.status(401);
+            throw new Error('Email or password is incorrect')
+        }
     }
     else {
         res.status(401);
-        throw new Error('Invalid email or password')
+        throw new Error('Email and Password are required')
     }
 
 })
