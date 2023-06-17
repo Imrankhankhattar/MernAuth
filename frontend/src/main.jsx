@@ -7,6 +7,9 @@ import './index.css'
 import Home from './screens/Home.jsx'
 import Login from './screens/Login.jsx'
 import Register from './screens/Register.jsx'
+import store from './store.js'
+import { Provider } from 'react-redux'
+
 const Router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<App />}>
@@ -17,7 +20,9 @@ const Router = createBrowserRouter(
   )
 )
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <RouterProvider router={Router}></RouterProvider>
-  </React.StrictMode>,
+  <Provider store={store}>
+    <React.StrictMode>
+      <RouterProvider router={Router}></RouterProvider>
+    </React.StrictMode>
+  </Provider>
 )

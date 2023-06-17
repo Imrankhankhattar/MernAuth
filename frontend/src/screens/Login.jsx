@@ -1,13 +1,37 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { Form, Button, Row, Col } from 'react-bootstrap'
 import FormContainer from "../components/formContainer"
+import { useDispatch, useSelector } from "react-redux"
+import { useLoginMutation } from "../slices/user"
+import { setInfo } from "../slices/auth"
+import { toast } from "react-toastify"
+
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const [login, { isLoading }] = useLoginMutation();
+    const { userInfo } = useSelector((state) => state.auth)
     const submitHandler = async (e) => {
         e.preventDefault();
+        try {
+            const response = await login({
+                email,
+                password
+            }).unwrap();
+            dispatch(setInfo({ ...response }))
+            navigate('/')
+        } catch (error) {
+            toast.error(error.data.message)
+        }
     }
+    useEffect(() => {
+        if (userInfo) {
+            navigate('/')
+        }
+    }, [navigate, userInfo])
     return (
         <FormContainer>
             <h1>Sign In</h1>
@@ -21,12 +45,12 @@ const Login = () => {
                         onChange={(e) => setEmail(e.target.value)}>
                     </Form.Control>
                 </Form.Group>
-                <Form.Group className="my-2" controlId="email">
+                <Form.Group className="my-2" controlId="password">
                     <Form.Label>Enter Password</Form.Label>
                     <Form.Control
                         type="password"
                         placeholder="Enter Password"
-                        value={email}
+                        value={password}
                         onChange={(e) => setPassword(e.target.value)}>
                     </Form.Control>
                 </Form.Group>
